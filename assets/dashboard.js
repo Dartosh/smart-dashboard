@@ -62,8 +62,9 @@
 
   var MONTH_LABELS = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
 
-  // Doughnut palette (neutral blue family, matches mockup-a-v1.html visual reference).
-  var PALETTE = ['#2f5d9e', '#4a7bc8', '#6f9bd8', '#9bbce6', '#c2d6f0', '#1f3f6e', '#86a8d4', '#5a86c2'];
+  // Качественная палитра колец: РАЗНЫЕ оттенки (а не близкие тона одного цвета),
+  // чтобы соседние секторы (заказчики) внутри диаграммы чётко различались.
+  var PALETTE = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#0d9488', '#9333ea', '#64748b'];
 
   // Read a single block's inline JSON by its data-sd tag. DashboardView emits one script per block.
   // textContent is already faithful (hex-escaped by json_encode), so plain JSON.parse — NO entity decode.
@@ -109,13 +110,25 @@
     return colors;
   }
 
+  // Как paletteFor, но по переданному массиву цветов (для второй палитры «по оплате»).
+  function paletteForArr(count, arr) {
+    var src = arr && arr.length ? arr : PALETTE;
+    var colors = [];
+    var i;
+    for (i = 0; i < count; i++) {
+      colors.push(src[i % src.length]);
+    }
+    return colors;
+  }
+
   // --- Block 1: doughnut config from labels/values arrays.
-  function doughnutConfig(labels, values) {
+  // palette — необязательная палитра цветов (по умолчанию синяя PALETTE).
+  function doughnutConfig(labels, values, palette) {
     return {
       type: 'doughnut',
       data: {
         labels: labels,
-        datasets: [{ data: values, backgroundColor: paletteFor(labels.length), borderWidth: 1, borderColor: '#ffffff' }]
+        datasets: [{ data: values, backgroundColor: paletteForArr(labels.length, palette || PALETTE), borderWidth: 1, borderColor: '#ffffff' }]
       },
       options: {
         responsive: true,
@@ -158,7 +171,7 @@
         datasets: [
           { label: 'Доход', data: revenue, borderColor: '#2f5d9e', backgroundColor: 'rgba(47,93,158,0.10)', tension: 0.25, fill: false },
           { label: 'Расход', data: expense, borderColor: '#c0504d', backgroundColor: 'rgba(192,80,77,0.10)', tension: 0.25, fill: false },
-          { label: 'Прибыль', data: profit, borderColor: '#4a7bc8', backgroundColor: 'rgba(74,123,200,0.10)', tension: 0.25, fill: false }
+          { label: 'Прибыль', data: profit, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.10)', tension: 0.25, fill: false }
         ]
       },
       options: {
@@ -256,9 +269,8 @@
   }
 
   function applyBlock1Filter(root, ctx) {
-    var from = ctx.fromInput && ctx.fromInput.value ? ctx.fromInput.value : '';
-    var to = ctx.toInput && ctx.toInput.value ? ctx.toInput.value : '';
     var status = ctx.statusSelect && ctx.statusSelect.value ? ctx.statusSelect.value : '';
+    var year = ctx.yearSelect && ctx.yearSelect.value ? ctx.yearSelect.value : '';
 
     var rows = ctx.rows;
     var data = ctx.jsonRows; // block1.rows[] aligned by index with rows[]
@@ -272,14 +284,11 @@
       var rowDate = tr.getAttribute('data-date') || '';
       var rowStatus = tr.getAttribute('data-status') || '';
       var show = true;
-      // ISO YYYY-MM-DD strings compare lexicographically == chronologically.
-      if (from && rowDate && rowDate < from) {
-        show = false;
-      }
-      if (to && rowDate && rowDate > to) {
-        show = false;
-      }
       if (status && status !== '__ALL__' && rowStatus !== status) {
+        show = false;
+      }
+      // Год: сравниваем по первым 4 символам ISO-даты строки (YYYY).
+      if (year && rowDate && rowDate.substring(0, 4) !== year) {
         show = false;
       }
       tr.style.display = show ? '' : 'none';
@@ -341,14 +350,6 @@
     bar.className = 'sd-filters';
     bar.setAttribute('data-sd-filters', '1');
 
-    var fromInput = document.createElement('input');
-    fromInput.type = 'date';
-    fromInput.setAttribute('data-sd-filter', 'date-from');
-
-    var toInput = document.createElement('input');
-    toInput.type = 'date';
-    toInput.setAttribute('data-sd-filter', 'date-to');
-
     var statusSelect = document.createElement('select');
     statusSelect.setAttribute('data-sd-filter', 'status');
     var all = document.createElement('option');
@@ -364,28 +365,54 @@
       statusSelect.appendChild(opt);
     }
 
-    var lblFrom = document.createElement('label');
-    lblFrom.textContent = 'С ';
-    lblFrom.appendChild(fromInput);
-    var lblTo = document.createElement('label');
-    lblTo.textContent = ' по ';
-    lblTo.appendChild(toInput);
+    // Селектор «Год»: первая опция «Все» (пусто), затем УНИКАЛЬНЫЕ годы из
+    // block1.rows[].date (первые 4 символа), отсортированные по убыванию.
+    var yearSelect = document.createElement('select');
+    yearSelect.setAttribute('data-sd-filter', 'year');
+    var allYears = document.createElement('option');
+    allYears.value = '';
+    allYears.textContent = 'Все';
+    yearSelect.appendChild(allYears);
+    var jsonRows = (block1 && block1.rows && block1.rows.length) ? block1.rows : [];
+    var yearSet = {};
+    var years = [];
+    var r;
+    for (r = 0; r < jsonRows.length; r++) {
+      var d = jsonRows[r] && jsonRows[r].date ? String(jsonRows[r].date) : '';
+      var y = d.substring(0, 4);
+      if (y && !yearSet.hasOwnProperty(y)) {
+        yearSet[y] = true;
+        years.push(y);
+      }
+    }
+    // По убыванию (как строки YYYY — лексикографически == численно).
+    years.sort(function (a, b) {
+      return a < b ? 1 : (a > b ? -1 : 0);
+    });
+    for (i = 0; i < years.length; i++) {
+      var yopt = document.createElement('option');
+      yopt.value = years[i];
+      yopt.textContent = years[i];
+      yearSelect.appendChild(yopt);
+    }
+
+    var lblYear = document.createElement('label');
+    lblYear.textContent = 'Год ';
+    lblYear.appendChild(yearSelect);
     var lblStatus = document.createElement('label');
     lblStatus.textContent = ' Статус ';
     lblStatus.appendChild(statusSelect);
 
-    bar.appendChild(lblFrom);
-    bar.appendChild(lblTo);
+    bar.appendChild(lblYear);
     bar.appendChild(lblStatus);
 
     table.parentNode.insertBefore(bar, table);
 
     var ctx = {
-      fromInput: fromInput,
-      toInput: toInput,
       statusSelect: statusSelect,
+      yearSelect: yearSelect,
       rows: block1Rows(root),
-      jsonRows: (block1 && block1.rows && block1.rows.length) ? block1.rows : [],
+      jsonRows: jsonRows,
       totalCell: block1TotalCell(root),
       state: state
     };
@@ -393,11 +420,8 @@
     var handler = function () {
       applyBlock1Filter(root, ctx);
     };
-    fromInput.addEventListener('change', handler);
-    fromInput.addEventListener('input', handler);
-    toInput.addEventListener('change', handler);
-    toInput.addEventListener('input', handler);
     statusSelect.addEventListener('change', handler);
+    yearSelect.addEventListener('change', handler);
   }
 
   // Reload the page setting the chosen year on the given query param (paramName),
@@ -462,6 +486,16 @@
       // страница не заменит текущую. Имя параметра берём из data-sd-year самого
       // селектора (sd_year_econ для Блока 2, sd_year_ship для Блока 3) — блоки
       // независимы, параметр второго блока сохраняется при reload.
+      // Перед reload запоминаем блок, чей год меняем, чтобы после перезагрузки
+      // вернуть на него скролл (не прыгать наверх). sessionStorage переживает
+      // reload (тот же origin).
+      var blk = select.closest ? select.closest('[data-sd-block]') : null;
+      var tag = blk ? blk.getAttribute('data-sd-block') : '';
+      try {
+        if (tag) {
+          window.sessionStorage.setItem('sd-scroll-block', tag);
+        }
+      } catch (e) { /* ignore */ }
       showLoader(root);
       var paramName = select.getAttribute('data-sd-year');
       reloadWithYear(paramName, select.value);
@@ -514,11 +548,36 @@
       var block2 = readBlock(root, 'b2');
       var block3 = readBlock(root, 'b3');
 
-      var state = { b1chart: null, b1paychart: null, b2chart: null, b3chart: null };
+      var state = { b1chart: null, b1paychart: null, b2chart: null, b3chart: null, bannerchart: null };
 
       // Year selectors (live inside Blocks 2/3): bind ALL -> reload with each
       // block's own param (sd_year_econ / sd_year_ship), independently.
       bindYearSelects(root);
+
+      // Баннер вверху — статичный абстрактный SVG-рисунок (DashboardView::bannerSvg),
+      // графика на нём нет. Ниже — только клик-обработчик: скролл к Блоку 2.
+
+      // Клик по баннеру → плавный скролл к Блоку 2 (экономика). Enter/Space —
+      // для доступности с клавиатуры (баннер имеет role=button/tabindex).
+      var banner = root.querySelector('[data-sd-banner]');
+      if (banner) {
+        var goToB2 = function () {
+          var b2 = root.querySelector('[data-sd-block="b2"]');
+          if (b2) {
+            b2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+        banner.addEventListener('click', goToB2);
+        banner.addEventListener('keydown', function (ev) {
+          var key = ev.key || '';
+          if (key === 'Enter' || key === ' ' || key === 'Spacebar') {
+            if (ev.preventDefault) {
+              ev.preventDefault();
+            }
+            goToB2();
+          }
+        });
+      }
 
       // Block 1: doughnut by customer. JSON may be present while the canvas is absent (empty rows) — null-check.
       if (chartReady && block1 && block1.byCustomer) {
@@ -586,6 +645,39 @@
           state.b3chart = chart3;
         }
       }
+
+      // Тумблер «Скрыть данные»: переключает класс sd-charts-only на корне
+      // (CSS прячет таблицы/KPI/фильтры/селекторы года/бейджи, оставляя графики).
+      // resize-событие подталкивает responsive-графики Chart.js перерисоваться
+      // после скрытия/показа окружающих элементов.
+      var tgl = root.querySelector('[data-sd-toggle-data]');
+      if (tgl) {
+        tgl.addEventListener('click', function () {
+          var on = root.className.indexOf('sd-charts-only') === -1;
+          root.className = on
+            ? (root.className + ' sd-charts-only')
+            : root.className.replace(/(^|\s)sd-charts-only(\s|$)/g, ' ').replace(/^\s+|\s+$/g, '');
+          tgl.textContent = on ? 'Показать данные' : 'Скрыть данные';
+          if (window.dispatchEvent) {
+            window.dispatchEvent(new Event('resize'));
+          }
+        });
+      }
+
+      // Восстановление скролла после reload по смене года: если перед reload
+      // запоминали блок, прокручиваем к нему и сбрасываем флаг.
+      try {
+        var jb = window.sessionStorage.getItem('sd-scroll-block');
+        if (jb) {
+          window.sessionStorage.removeItem('sd-scroll-block');
+          var el = root.querySelector('[data-sd-block="' + jb + '"]');
+          if (el) {
+            setTimeout(function () {
+              el.scrollIntoView({ block: 'start' });
+            }, 0);
+          }
+        }
+      } catch (e) { /* ignore */ }
 
       root.setAttribute('data-sd-init', '1');
     } finally {
