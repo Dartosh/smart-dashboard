@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>СМАРТ ООО · Аналитика</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<!-- ===================================================================
+     СМАРТ ООО · Аналитика — автономная страница для проверки по Pages-URL
+     и локально. Разметка-каркас; вся логика — в ES-модулях js/app.js.
+     Никакого PHP, никаких обращений к 1С. Единственные внешние сетевые
+     операции: fetch(SD_DATA_URL) и <script> Chart.js с CDN (фолбэк — локально).
+     ================================================================== -->
+<div class="smart-dash" id="smart-dash-root">
+  <div class="sd-loader" data-sd-loader><div class="sd-spinner" aria-hidden="true"></div></div>
+</div>
+
+<!-- ===================================================================
+     КОНФИГ. Страница автономна: data.json лежит рядом (в той же папке /docs на Pages),
+     поэтому здесь ничего менять не нужно. В Bitrix24 эта страница встраивается через
+     <iframe> на её Pages-URL (см. README, раздел «Встроить в Bitrix24»).
+     ================================================================== -->
+<script>window.SD_DATA_URL = "./data.json";</script>
+
+<!-- Chart.js 4.4.1 с CDN. Если CDN недоступен — onerror подхватывает локальную
+     копию assets/chart.umd.min.js (document.write сохраняет порядок выполнения
+     ДО запуска ES-модуля app.js). Классические <script> блокируют парсинг и
+     выполняются по порядку, поэтому к моменту старта модуля window.Chart готов. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" onerror="document.write('\x3Cscript src=&quot;assets/chart.umd.min.js&quot;>\x3C/script>')"></script>
+
+<!-- Основной код — ES-модуль. -->
+<script type="module" src="js/app.js"></script>
+
+<!-- Репортер высоты iframe (безвреден вне фрейма). -->
+<script src="js/iframe-resize.js"></script>
+</body>
+</html>

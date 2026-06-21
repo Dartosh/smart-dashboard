@@ -1,0 +1,11 @@
+{
+  "name": "smart-dashboard-data",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build-data": "node scripts/build-data.mjs"
+  }
+}

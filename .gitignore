@@ -1,0 +1,19 @@
+# Локальная конфигурация с кредами 1С — НИКОГДА не коммитим.
+config.local.php
+*.local.php
+.env
+.env.*
+
+# Системное / временное.
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*~
+
+# Кэш и зависимости.
+cache/
+vendor/
+node_modules/
+npm-debug.log*

@@ -1,0 +1,78 @@
+html,body{margin:0;background:#eef0f3}
+.smart-dash{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,Helvetica,sans-serif;color:#1f2937;line-height:1.45;background:#f7f8fa;padding:22px;border-radius:10px;max-width:1080px;margin:0 auto;box-sizing:border-box;position:relative}
+.smart-dash *{box-sizing:border-box}
+.smart-dash .sd-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(247,248,250,.75);z-index:50;border-radius:10px;animation:sdLoaderTimeout 0s linear 12s forwards}
+.smart-dash .sd-loader[hidden],.smart-dash .sd-loader.is-hidden{display:none}
+.smart-dash .sd-spinner{position:fixed;top:50%;left:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:4px solid #e5e7eb;border-top-color:#2563eb;animation:sdSpin .8s linear infinite}
+@keyframes sdSpin{to{transform:rotate(360deg)}}
+@keyframes sdLoaderTimeout{to{visibility:hidden;opacity:0}}
+.smart-dash .sd-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 18px;flex-wrap:wrap;gap:8px}
+.smart-dash .sd-head h1{font-size:22px;margin:0;font-weight:700;color:#1f2937}
+.smart-dash .sd-head .sd-asof{font-size:12px;color:#6b7280}
+.smart-dash .sd-head .sd-asof.sd-stale{color:#9a6700}
+.smart-dash .sd-toggle{font-size:12px;padding:6px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#1d4ed8;cursor:pointer;font-family:inherit}
+.smart-dash .sd-toggle:hover{background:#eff6ff;border-color:#93c5fd}
+.smart-dash.sd-charts-only .sd-table-wrap,.smart-dash.sd-charts-only .sd-kpis,.smart-dash.sd-charts-only .sd-age,.smart-dash.sd-charts-only .sd-ofr{display:none}
+.smart-dash .sd-banner{position:relative;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;margin:0 0 18px;cursor:pointer;height:312px}
+.smart-dash .sd-banner:hover{border-color:#93c5fd;box-shadow:0 2px 10px rgba(37,99,235,.20)}
+.smart-dash .sd-banner-svg{display:block;width:100%;height:100%}
+.smart-dash .sd-banner-cap{position:absolute;left:20px;top:16px;margin:0;font-size:15px;font-weight:700;color:#ffffff;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.smart-dash .sd-year{margin:0 0 14px}
+.smart-dash .sd-year label{display:inline-flex;align-items:center;font-size:12px;color:#6b7280;gap:6px}
+.smart-dash .sd-year select{font-size:13px;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#1f2937;font-family:inherit}
+.smart-dash .sd-block{background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin:0 0 18px}
+.smart-dash .sd-block:last-child{margin-bottom:0}
+.smart-dash .sd-h{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:16px;font-weight:650;color:#1f2937;text-transform:none}
+.smart-dash .sd-h .sd-num{background:#2563eb;color:#fff;font-size:12px;width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:700}
+.smart-dash .sd-chart-below{margin-top:20px}
+.smart-dash .sd-chart-narrow{max-width:460px;margin:20px auto 0}
+.smart-dash .sd-chart-cap{font-size:12px;color:#6b7280;text-align:center;margin:0 0 8px;font-weight:600}
+.smart-dash .sd-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;border-radius:10px}
+.smart-dash .sd-tbl-wide{min-width:760px}
+.smart-dash .sd-eis-btn{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;line-height:1.45}
+.smart-dash .sd-eis-btn:hover{background:#dbeafe;border-color:#93c5fd}
+.smart-dash .sd-eis-ico{flex:0 0 auto}
+.smart-dash .sd-muted{color:#9ca3af}
+.smart-dash .sd-numlink{color:#1d4ed8;text-decoration:underline}
+.smart-dash table.sd-tbl{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;font-size:13px;background:#fff;margin:0}
+.smart-dash table.sd-tbl th{text-align:left;color:#6b7280;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.02em;padding:9px 12px;background:#f9fafb;border-bottom:1px solid #e5e7eb}
+.smart-dash table.sd-tbl td{padding:9px 12px;border-bottom:1px solid #f1f3f5;color:#1f2937}
+.smart-dash table.sd-tbl tbody tr:last-child td{border-bottom:none}
+.smart-dash table.sd-tbl .sd-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.smart-dash table.sd-tbl tfoot td{font-weight:700;border-top:2px solid #e5e7eb;border-bottom:none;background:#f9fafb}
+.smart-dash .sd-total{font-weight:700}
+.smart-dash .sd-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#f1f5f9;color:#475569;white-space:nowrap;line-height:1.5}
+.smart-dash .sd-badge.sd-done{background:#dcfce7;color:#166534}
+.smart-dash .sd-badge.sd-work{background:#fef3c7;color:#92400e}
+.smart-dash .sd-badge.sd-new{background:#f1f5f9;color:#475569}
+.smart-dash .sd-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 16px}
+.smart-dash .sd-kpi{border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;background:#fff;min-width:0}
+.smart-dash .sd-kpi-l{font-size:12px;color:#6b7280;margin-bottom:6px}
+.smart-dash .sd-kpi-v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;color:#1f2937;white-space:nowrap}
+.smart-dash .sd-kpi-sub{display:block;font-size:11px;font-weight:400;color:#6b7280;margin-top:4px;white-space:nowrap}
+.smart-dash .sd-chart{position:relative;width:100%;height:300px;margin:0}
+.smart-dash .sd-age{font-size:12px;color:#6b7280;margin:0 0 12px}
+.smart-dash .sd-stale{color:#9a6700}
+.smart-dash .sd-unavailable{color:#9a6700;font-style:italic;margin:0}
+.smart-dash .sd-empty{color:#6b7280;font-style:italic;margin:0}
+.smart-dash .sd-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:0 0 12px}
+.smart-dash .sd-filters label{display:flex;flex-direction:column;font-size:12px;color:#6b7280;gap:3px}
+.smart-dash .sd-filters input,.smart-dash .sd-filters select{font-size:13px;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:inherit}
+/* --- Сворачиваемая секция «Сверка с ОФР» (Блок 2) --- */
+.smart-dash .sd-ofr{margin-top:20px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.smart-dash .sd-ofr-toggle{width:100%;text-align:left;font-size:13px;font-weight:600;color:#1f2937;background:#f9fafb;border:none;border-bottom:1px solid #e5e7eb;padding:11px 14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
+.smart-dash .sd-ofr-toggle:hover{background:#f1f5f9}
+.smart-dash .sd-ofr-toggle .sd-ofr-caret{transition:transform .15s ease;display:inline-block}
+.smart-dash .sd-ofr.is-open .sd-ofr-toggle .sd-ofr-caret{transform:rotate(90deg)}
+.smart-dash .sd-ofr-body{display:none;padding:14px}
+.smart-dash .sd-ofr.is-open .sd-ofr-body{display:block}
+.smart-dash .sd-ofr-note{font-size:12px;color:#6b7280;margin:0 0 10px}
+.smart-dash .sd-ofr-note.sd-warn{color:#9a6700;font-style:italic}
+.smart-dash .sd-verdict{margin:10px 0 0;font-size:13px;font-weight:700}
+.smart-dash .sd-verdict.sd-ok{color:#166534}
+.smart-dash .sd-verdict.sd-bad{color:#b91c1c}
+.smart-dash .sd-ofr .sd-yes{color:#166534;font-weight:600}
+.smart-dash .sd-ofr .sd-no{color:#b91c1c;font-weight:600}
+@media(max-width:680px){.smart-dash .sd-head h1{font-size:19px}}
+@media(max-width:600px){.smart-dash{padding:12px}.smart-dash .sd-block{padding:14px}}
+@media(max-width:420px){.smart-dash .sd-kpi-v{font-size:18px}}

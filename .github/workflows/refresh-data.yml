@@ -1,0 +1,59 @@
+name: refresh-data
+
+# Раз в 6 часов (cron) и по кнопке (workflow_dispatch).
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+# Нужно право записи, чтобы закоммитить обновлённый docs/data.json.
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Проект zero-dep: внешних зависимостей нет, npm install не нужен.
+      # Шаг ниже подстрахован на случай, если когда-нибудь появится package-lock.json.
+      - name: Установить зависимости (если появятся)
+        if: ${{ hashFiles('package-lock.json') != '' }}
+        run: npm ci
+
+      - name: Сгенерировать данные
+        # scripts/build-data.mjs ходит в 1С:Fresh (УНФ + Бухгалтерия) по OData
+        # и пишет компактный снимок в docs/data.json (web/ = корень репо).
+        run: node scripts/build-data.mjs
+        env:
+          # Секреты (логины/пароли урезанного пользователя 1С и GUID организаций) — только из GitHub Secrets.
+          ODATA_BASE_UNF: ${{ secrets.ODATA_BASE_UNF }}
+          ODATA_USER_UNF: ${{ secrets.ODATA_USER_UNF }}
+          ODATA_PASS_UNF: ${{ secrets.ODATA_PASS_UNF }}
+          ORG_FILTER_UNF: ${{ secrets.ORG_FILTER_UNF }}
+          ODATA_BASE_BUH: ${{ secrets.ODATA_BASE_BUH }}
+          ODATA_USER_BUH: ${{ secrets.ODATA_USER_BUH }}
+          ODATA_PASS_BUH: ${{ secrets.ODATA_PASS_BUH }}
+          ORG_FILTER_BUH: ${{ secrets.ORG_FILTER_BUH }}
+          # Несекретные параметры — из repo variables (необязательные).
+          REPORT_YEARS: ${{ vars.REPORT_YEARS }}
+          REPORT_YEAR: ${{ vars.REPORT_YEAR }}
+
+      - name: Закоммитить, если изменилось
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data.json
+          if git diff --cached --quiet; then
+            echo "Изменений в docs/data.json нет — коммит не требуется."
+          else
+            git commit -m "chore: refresh dashboard data [skip ci]"
+            git push
+          fi
