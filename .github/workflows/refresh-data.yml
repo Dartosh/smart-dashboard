@@ -6,7 +6,7 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
-# Нужно право записи, чтобы закоммитить обновлённый docs/data.json.
+# Нужно право записи, чтобы закоммитить обновлённый data.json.
 permissions:
   contents: write
 
@@ -30,7 +30,7 @@ jobs:
 
       - name: Сгенерировать данные
         # scripts/build-data.mjs ходит в 1С:Fresh (УНФ + Бухгалтерия) по OData
-        # и пишет компактный снимок в docs/data.json (web/ = корень репо).
+        # и пишет компактный снимок в data.json (web/ = корень репо).
         run: node scripts/build-data.mjs
         env:
           # Секреты (логины/пароли урезанного пользователя 1С и GUID организаций) — только из GitHub Secrets.
@@ -50,9 +50,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data.json
+          git add data.json
           if git diff --cached --quiet; then
-            echo "Изменений в docs/data.json нет — коммит не требуется."
+            echo "Изменений в data.json нет — коммит не требуется."
           else
             git commit -m "chore: refresh dashboard data [skip ci]"
             git push

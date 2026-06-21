@@ -3,7 +3,7 @@
 // web/build-data.php на Node (zero-dep, нативный fetch, ES-модули).
 //
 // Запрашивает живой 1С:Fresh (УНФ + Бухгалтерия) по OData и пишет КОМПАКТНЫЙ
-// снимок в docs/data.json.
+// снимок в data.json (в корне репозитория — там же, где index.html).
 //   CI:        node scripts/build-data.mjs   — конфиг из переменных окружения.
 //   Локально:  node scripts/build-data.mjs   — конфиг из ../config.local.php.
 //
@@ -28,7 +28,7 @@ const WEB_DIR = dirname(SCRIPTS_DIR); // web/  (= __DIR__ из build-data.php)
 const stdout = (s) => process.stdout.write(s);
 const stderr = (s) => process.stderr.write(s);
 
-/** Путь вывода: --out=<path> | OUT_FILE | docs/data.json (от web/). */
+/** Путь вывода: --out=<path> | OUT_FILE | data.json (в корне репо = web/). */
 function resolveOutFile() {
   for (const arg of process.argv.slice(2)) {
     if (arg.startsWith('--out=')) {
@@ -40,7 +40,7 @@ function resolveOutFile() {
     const p = process.env.OUT_FILE;
     return isAbsolute(p) ? p : resolve(process.cwd(), p);
   }
-  return join(WEB_DIR, 'docs', 'data.json');
+  return join(WEB_DIR, 'data.json');
 }
 
 async function main() {

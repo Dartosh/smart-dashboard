@@ -7,11 +7,11 @@
 
 - **GitHub Action** (`.github/workflows/refresh-data.yml`) раз в 6 часов запускает Node-экстрактор
   `scripts/build-data.mjs`, который ходит в 1С:Fresh (УНФ + Бухгалтерия) по OData и собирает
-  компактный снимок `docs/data.json` (агрегированные числа, ~5–15 КБ), после чего коммитит его
+  компактный снимок `data.json` (агрегированные числа, ~5–15 КБ), после чего коммитит его
   в репозиторий.
-- **GitHub Pages** публикует папку `/docs` и отдаёт `data.json` с заголовком
+- **GitHub Pages** публикует **корень репозитория** (Source: `/ (root)`) и отдаёт `data.json` с заголовком
   `Access-Control-Allow-Origin: *`, поэтому CORS не мешает читать его из браузера.
-- **Клиент** (`docs/index.html` + `docs/css/` + `docs/js/`) подтягивает `data.json` по `fetch`
+- **Клиент** (`index.html` + `css/` + `js/`) подтягивает `data.json` по `fetch`
   и рисует весь UI на JavaScript. Переключение года и режим «Все года» считаются на клиенте.
 
 Данные обновляются автоматически раз в 6 часов. Пароли 1С нигде, кроме GitHub Secrets, не хранятся
@@ -24,15 +24,16 @@
 Содержимое каталога `web/` — это **корень** публикуемого репозитория.
 
 ```
-.
-├── docs/                  ← публикуется через GitHub Pages
-│   ├── index.html         ← страница дашборда (встраивается в Bitrix24 через iframe)
-│   ├── css/               ← стили
-│   ├── js/                ← клиентская логика (рендер, графики, переключение года)
-│   ├── assets/            ← шрифты, иконки, библиотеки графиков
-│   └── data.json          ← снимок данных из 1С (генерируется автоматически)
-├── scripts/
-│   └── build-data.mjs     ← Node-экстрактор: OData → docs/data.json
+.                          ← корень репозитория = публикуется через GitHub Pages (Source: / root)
+├── index.html             ← страница дашборда (встраивается в Bitrix24 через iframe)
+├── css/                   ← стили
+├── js/                    ← клиентская логика (рендер, графики, переключение года)
+├── assets/                ← иконка, фолбэк-копия Chart.js, favicon
+├── data.json              ← снимок данных из 1С (генерируется автоматически)
+├── robots.txt
+├── scripts/               ← Node-экстрактор (в браузер не попадает)
+│   ├── build-data.mjs     ← OData → data.json
+│   └── lib/               ← модули порта (odata, unf, buh, …)
 ├── package.json           ← метаданные проекта (зависимостей нет, zero-dep)
 ├── .github/workflows/
 │   └── refresh-data.yml    ← обновление данных по расписанию и по кнопке
@@ -49,7 +50,7 @@
 ### 1. Создать репозиторий и запушить содержимое `web/` как корень
 
 Содержимое каталога `web/` — это **корень** будущего репозитория. Пушим именно содержимое `web/`
-(то есть `scripts/`, `docs/`, `package.json`, `.github/`, `README.md`, `.gitignore`), а не саму папку `web/`.
+(то есть `index.html`, `css/`, `js/`, `assets/`, `data.json`, `scripts/`, `package.json`, `.github/`, `README.md`, `.gitignore`), а не саму папку `web/`.
 
 ```bash
 # находясь внутри web/
@@ -88,21 +89,21 @@ git push -u origin main
 
 ### 3. Включить GitHub Pages
 
-Settings → **Pages** → Source: **Deploy from a branch** → ветка **main**, папка **`/docs`**. Сохранить.
+Settings → **Pages** → Source: **Deploy from a branch** → ветка **main**, папка **`/ (root)`**. Сохранить.
 
 ### 4. Запустить workflow вручную и проверить данные
 
 Actions → **refresh-data** → **Run workflow**. Дождаться зелёного прогона и убедиться, что в репозитории
-появился/обновился коммит `chore: refresh dashboard data [skip ci]` с изменённым `docs/data.json`.
+появился/обновился коммит `chore: refresh dashboard data [skip ci]` с изменённым `data.json`.
 
 ### 5. Проверить дашборд по Pages-URL
 
-Открыть `https://USER.github.io/REPO/` — должна отрендериться автономная страница (`docs/index.html`)
+Открыть `https://USER.github.io/REPO/` — должна отрендериться автономная страница (`index.html`)
 со всеми блоками. Это контрольная проверка перед встраиванием в Bitrix24.
 
 ### 6. Встроить в Bitrix24 через `<iframe>`
 
-Вся страница уже опубликована на Pages (`docs/index.html`). В Bitrix24 вставляется только маленький
+Вся страница уже опубликована на Pages (`index.html`). В Bitrix24 вставляется только маленький
 блок с `<iframe>` на ваш Pages-адрес. Страница сама сообщает свою высоту (`postMessage`), а
 крошечный скрипт рядом подгоняет высоту iframe — без внутренней полосы прокрутки, высота
 меняется при смене года/фильтров/«Скрыть данные». Никаких URL внутри страницы менять не нужно —
@@ -183,4 +184,4 @@ Actions → **refresh-data** → **Run workflow**. Дождаться зелён
   node scripts/build-data.mjs
   ```
 
-  Скрипт перезапишет `docs/data.json`. Зависимостей нет — достаточно Node 20+, `npm install` не нужен.
+  Скрипт перезапишет `data.json`. Зависимостей нет — достаточно Node 20+, `npm install` не нужен.
