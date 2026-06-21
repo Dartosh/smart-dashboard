@@ -1,12 +1,12 @@
 {
     "meta": {
-        "generatedAt": "2026-06-21T20:44:48+03:00",
+        "generatedAt": "2026-06-21T17:59:28+00:00",
         "reportYears": [
             2026,
             2025,
             2024
         ],
-        "defaultYear": 2025,
+        "defaultYear": 2026,
         "org": "СМАРТ ООО",
         "inn": "9727079722",
         "schema": 1
