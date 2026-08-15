@@ -1,6 +1,6 @@
 {
     "meta": {
-        "generatedAt": "2026-08-15T06:20:14+00:00",
+        "generatedAt": "2026-08-15T12:17:40+00:00",
         "reportYears": [
             2026,
             2025,
@@ -301,12 +301,12 @@
             ],
             "receivable": 154458759.75,
             "payable": 116471832.82,
-            "payTotal": 8918334.38,
+            "payTotal": 22975760.76,
             "payByCustomer": [
                 {
                     "inn": "9705101759",
                     "name": "ГАУ ЦТО",
-                    "amount": 8918334.38
+                    "amount": 22975760.76
                 }
             ],
             "revenueNet": 73360024.97,
