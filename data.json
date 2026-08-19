@@ -1,6 +1,6 @@
 {
     "meta": {
-        "generatedAt": "2026-08-19T00:39:27+00:00",
+        "generatedAt": "2026-08-19T06:26:05+00:00",
         "reportYears": [
             2026,
             2025,
@@ -340,13 +340,7 @@
             "receivable": 98079124.54,
             "payable": 104401099.93,
             "payTotal": 254437009.26,
-            "payByCustomer": [
-                {
-                    "inn": "7717043346",
-                    "name": "ГАОУ ВО МГПУ",
-                    "amount": 22451696.84
-                }
-            ],
+            "payByCustomer": [],
             "revenueNet": 183704013.37,
             "ofr": null
         },
