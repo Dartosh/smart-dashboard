@@ -1,6 +1,6 @@
 {
     "meta": {
-        "generatedAt": "2026-10-06T03:51:29+00:00",
+        "generatedAt": "2026-10-06T12:25:19+00:00",
         "reportYears": [
             2026,
             2025,
@@ -300,7 +300,7 @@
                 151604.66
             ],
             "receivable": 184648059.09,
-            "payable": 122041485.24,
+            "payable": 122541485.24,
             "payTotal": 87906795.85,
             "payByCustomer": [],
             "revenueNet": 89045828.04,
